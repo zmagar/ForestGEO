@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, FileWithPath } from 'react-dropzone';
 import { parse, ParseConfig } from 'papaparse';
 import Box from '@mui/material/Box';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
@@ -51,47 +51,56 @@ export function DropzonePure({
   );
 }
 
-export default function Dropzone() {
+export interface DropzoneProps {
+  onChange(acceptedFiles: FileWithPath[]): void;
+}
+
+export default function Dropzone({ onChange }: DropzoneProps) {
   // @ts-ignore
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file: File) => {
-      if (file.type !== 'text/csv') {
-        // Not the right type of file, so we skip it for now.
-        alert(
-          'Only .csv files are supported. Uploaded file is called:' +
-            file.name +
-            ':'
-        );
-        // Skip this file
-        return;
-      }
-
-      const reader = new FileReader();
-
-      reader.onabort = () => alert('file reading was aborted');
-      reader.onerror = () => alert('file reading has failed');
-      reader.onload = () => {
-        // Do whatever you want with the file contents
-        const binaryStr = reader.result as string;
-        console.log(binaryStr);
-        console.log(parse(binaryStr));
-        const config: ParseConfig = { delimiter: ',' };
-        const results = parse(binaryStr, config);
-
-        console.log(JSON.stringify(results.data));
-
-        if (results.errors.length) {
+  const onDrop = useCallback(
+    (acceptedFiles: FileWithPath[]) => {
+      acceptedFiles.forEach((file: FileWithPath) => {
+        if (file.type !== 'text/csv') {
+          // Not the right type of file, so we skip it for now.
           alert(
-            `Error on row: ${results.errors[0].row}. ${results.errors[0].message}`
+            'Only .csv files are supported. Uploaded file is called:' +
+              file.name +
+              ':'
           );
-          // Only print the first error for now to avoid dialog clog
+          // Skip this file
+          return;
         }
-      };
-      reader.readAsText(file);
-    });
-    // Do something with the files
-    // console.log('acceptedFiles', acceptedFiles);
-  }, []);
+
+        const reader = new FileReader();
+
+        reader.onabort = () => alert('file reading was aborted');
+        reader.onerror = () => alert('file reading has failed');
+        reader.onload = () => {
+          // Do whatever you want with the file contents
+          const binaryStr = reader.result as string;
+          console.log(binaryStr);
+          console.log(parse(binaryStr));
+          const config: ParseConfig = { delimiter: ',' };
+          const results = parse(binaryStr, config);
+
+          console.log(JSON.stringify(results.data));
+
+          if (results.errors.length) {
+            alert(
+              `Error on row: ${results.errors[0].row}. ${results.errors[0].message}`
+            );
+            // Only print the first error for now to avoid dialog clog
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      onChange(acceptedFiles);
+      // Do something with the files
+      // console.log('acceptedFiles', acceptedFiles);
+    },
+    [onChange]
+  );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
