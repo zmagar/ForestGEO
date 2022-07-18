@@ -6,7 +6,7 @@ interface FileListProps {
 
 export default function FileList({ acceptedFiles }: FileListProps) {
   const newFiles = acceptedFiles
-    .filter((file) => file.type == 'text/csv')
+    .filter((file) => file.type === 'text/csv')
     .map((file: FileWithPath) => (
       <li key={file.path}>
         {file.path} - {file.size} bytes
