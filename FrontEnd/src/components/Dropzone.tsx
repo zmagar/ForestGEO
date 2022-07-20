@@ -90,13 +90,6 @@ export default function Dropzone({ onChange }: DropzoneProps) {
           }
         };
         reader.readAsText(file);
-        rejectedFiles.forEach((fileRejection: FileRejection) => {
-          alert(
-            'Only .csv files are supported. Uploaded file is called:' +
-              fileRejection.file.name +
-              ':'
-          );
-        });
       });
 
       onChange(acceptedFiles, rejectedFiles);
