@@ -91,10 +91,6 @@ export default function Dropzone({ onChange }: DropzoneProps) {
         };
         reader.readAsText(file);
         rejectedFiles.forEach((fileRejection: FileRejection) => {
-          console.log(fileRejection.file.name);
-        });
-
-        rejectedFiles.forEach((fileRejection: FileRejection) => {
           alert(
             'Only .csv files are supported. Uploaded file is called:' +
               fileRejection.file.name +
@@ -105,8 +101,8 @@ export default function Dropzone({ onChange }: DropzoneProps) {
 
       onChange(acceptedFiles, rejectedFiles);
       // Do something with the files
-      console.log('acceptedFiles', acceptedFiles);
-      console.log('rejectedFiles', rejectedFiles);
+      // console.log('acceptedFiles', acceptedFiles);
+      // console.log('rejectedFiles', rejectedFiles);
 
       rejectedFiles.forEach((fileRejection: FileRejection) => {
         alert(
