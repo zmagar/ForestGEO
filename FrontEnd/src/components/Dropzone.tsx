@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { useDropzone, FileWithPath } from 'react-dropzone';
+import { useDropzone, FileWithPath, FileRejection } from 'react-dropzone';
 import { parse, ParseConfig } from 'papaparse';
 import Box from '@mui/material/Box';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
@@ -52,24 +52,23 @@ export function DropzonePure({
 }
 
 export interface DropzoneProps {
-  onChange(acceptedFiles: FileWithPath[]): void;
+  onChange(acceptedFiles: FileWithPath[], rejectedFiles: FileRejection[]): void;
 }
 
 export default function Dropzone({ onChange }: DropzoneProps) {
-  // @ts-ignore
   const onDrop = useCallback(
-    (acceptedFiles: FileWithPath[]) => {
+    (acceptedFiles: FileWithPath[], rejectedFiles: FileRejection[]) => {
       acceptedFiles.forEach((file: FileWithPath) => {
-        if (file.type !== 'text/csv') {
-          // Not the right type of file, so we skip it for now.
-          alert(
-            'Only .csv files are supported. Uploaded file is called:' +
-              file.name +
-              ':'
-          );
-          // Skip this file
-          return;
-        }
+        // if (file.type !== 'text/csv') {
+        //   // Not the right type of file, so we skip it for now.
+        //   alert(
+        //     'Only .csv files are supported. Uploaded file is called:' +
+        //       file.name +
+        //       ':'
+        //   );
+        //   // Skip this file
+        //   return;
+        // }
 
         const reader = new FileReader();
 
@@ -81,7 +80,7 @@ export default function Dropzone({ onChange }: DropzoneProps) {
           const config: ParseConfig = { delimiter: ',' };
           const results = parse(binaryStr, config);
 
-          //console.log(JSON.stringify(results.data));
+          // console.log(JSON.stringify(results.data));
 
           if (results.errors.length) {
             alert(
@@ -91,15 +90,38 @@ export default function Dropzone({ onChange }: DropzoneProps) {
           }
         };
         reader.readAsText(file);
+        rejectedFiles.forEach((fileRejection: FileRejection) => {
+          console.log(fileRejection.file.name);
+        });
+
+        rejectedFiles.forEach((fileRejection: FileRejection) => {
+          alert(
+            'Only .csv files are supported. Uploaded file is called:' +
+              fileRejection.file.name +
+              ':'
+          );
+        });
       });
 
-      onChange(acceptedFiles);
+      onChange(acceptedFiles, rejectedFiles);
       // Do something with the files
-      // console.log('acceptedFiles', acceptedFiles);
+      console.log('acceptedFiles', acceptedFiles);
+      console.log('rejectedFiles', rejectedFiles);
+
+      rejectedFiles.forEach((fileRejection: FileRejection) => {
+        alert(
+          ' The file ' +
+            fileRejection.file.name +
+            ' was not uploaded. Only .csv files are supported.'
+        );
+      });
     },
     [onChange]
   );
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: 'text/csv, application/vnd.ms-excel',
+  });
 
   return (
     <DropzonePure
