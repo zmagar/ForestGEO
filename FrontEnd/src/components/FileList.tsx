@@ -11,11 +11,16 @@ export default function FileList({ acceptedFilesList }: FileListProps) {
     </li>
   ));
 
+  const handleUpload = () => {
+    console.log('upload button clicked');
+  };
+
   return newFiles.length > 0 ? (
     <div>
       <aside>
         <ul>{newFiles}</ul>
       </aside>
+      <button onClick={handleUpload}>Upload</button>
     </div>
   ) : (
     <div>
